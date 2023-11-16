@@ -1,5 +1,5 @@
 import React from 'react'
-import { Row, Col, Container } from 'react-bootstrap'
+import { Row, Col } from 'react-bootstrap'
 import products from '../products'
 import Product from '../components/Product'
 
@@ -13,7 +13,7 @@ const HomeScreen = () => {
                     <Product product={product} />
                 </Col>
             ))}
-        </Row>
+            </Row>
     </>
   )
 }
