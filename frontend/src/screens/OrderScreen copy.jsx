@@ -1,25 +1,16 @@
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import {
-  Row,
-  Col,
-  ListGroup,
-  Image,
-  Form,
-  Card,
-  Button,
-} from 'react-bootstrap';
-import { toast } from 'react-toastify';
-import { useSelector } from 'react-redux';
+import { Row, Col, ListGroup, Image, Card, Button } from 'react-bootstrap';
 import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
-import Loader from '../components/Loader';
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import Message from '../components/Message';
+import Loader from '../components/Loader';
 import {
-  useGetOrderDetailsQuery,
-  usePayOrderMutation,
-  useGetPaypalClientIdQuery,
   useDeliverOrderMutation,
-  useUndeliverOrderMutation,
+  useGetOrderDetailsQuery,
+  useGetPaypalClientIdQuery,
+  usePayOrderMutation,
 } from '../slices/ordersApiSlice';
 
 const OrderScreen = () => {
@@ -37,8 +28,7 @@ const OrderScreen = () => {
   const [deliverOrder, { isLoading: loadingDeliver }] =
     useDeliverOrderMutation();
 
-    const [undeliverOrder, { isLoading: loadingUndeliver }] =
-    useUndeliverOrderMutation();
+  const { userInfo } = useSelector((state) => state.auth);
 
   const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
 
@@ -47,8 +37,6 @@ const OrderScreen = () => {
     isLoading: loadingPayPal,
     error: errorPayPal,
   } = useGetPaypalClientIdQuery();
-
-  const { userInfo } = useSelector((state) => state.auth);
 
   useEffect(() => {
     if (!errorPayPal && !loadingPayPal && paypal.clientId) {
@@ -68,25 +56,28 @@ const OrderScreen = () => {
         }
       }
     }
-  }, [order, paypal, paypalDispatch, errorPayPal, loadingPayPal]);
+  }, [errorPayPal, loadingPayPal, order, paypal, paypalDispatch]);
 
   function onApprove(data, actions) {
     return actions.order.capture().then(async function (details) {
       try {
-        await payOrder({ orderId, details }).unwrap();
+        await payOrder({ orderId, details });
         refetch();
-        toast.success('Payment successful');
+        toast.success('Order is paid');
       } catch (err) {
         toast.error(err?.data?.message || err.error);
       }
     });
   }
 
-  async function onApproveTest() {
-    await payOrder({ orderId, details: { payer: {} } }).unwraop();
-    refetch();
-    toast.success('Payment successful');
-  }
+  // TESTING ONLY! REMOVE BEFORE PRODUCTION
+  // async function onApproveTest() {
+  //   await payOrder({ orderId, details: { payer: {} } });
+  //   refetch();
+
+  //   toast.success('Order is paid');
+  // }
+
   function onError(err) {
     toast.error(err.message);
   }
@@ -96,41 +87,24 @@ const OrderScreen = () => {
       .create({
         purchase_units: [
           {
-            amount: {
-              value: order.totalPrice,
-            },
+            amount: { value: order.totalPrice },
           },
         ],
       })
-      .then((orderId) => {
-        return orderId;
+      .then((orderID) => {
+        return orderID;
       });
   }
 
-  const deliverOrderHandler = async () => {
-    try {
-      await deliverOrder(orderId).unwrap();
-      refetch();
-      toast.success('Order Delivered');
-    } catch (err) {
-      toast.error(err?.data?.message || err.message);
-    }
-  };
-
-  const undeliverOrderHandler = async () => {
-    try {
-      await undeliverOrder(orderId).unwrap();
-      refetch();
-      toast.success('Order Not Delivered');
-    } catch (err) {
-      toast.error(err?.data?.message || err.message);
-    }
+  const deliverHandler = async () => {
+    await deliverOrder(orderId);
+    refetch();
   };
 
   return isLoading ? (
     <Loader />
   ) : error ? (
-    <Message variant='danger' />
+    <Message variant='danger'>{error.data.message}</Message>
   ) : (
     <>
       <h1>Order {order._id}</h1>
@@ -140,15 +114,14 @@ const OrderScreen = () => {
             <ListGroup.Item>
               <h2>Shipping</h2>
               <p>
-                <strong>Name: </strong>
-                {order.user.name}
+                <strong>Name: </strong> {order.user.name}
               </p>
               <p>
-                <strong>Email: </strong>
-                {order.user.email}
+                <strong>Email: </strong>{' '}
+                <a href={`mailto:${order.user.email}`}>{order.user.email}</a>
               </p>
               <p>
-                <strong>Address: </strong>
+                <strong>Address:</strong>
                 {order.shippingAddress.address}, {order.shippingAddress.city}{' '}
                 {order.shippingAddress.postalCode},{' '}
                 {order.shippingAddress.country}
@@ -238,20 +211,22 @@ const OrderScreen = () => {
                   <Col>${order.totalPrice}</Col>
                 </Row>
               </ListGroup.Item>
-
               {!order.isPaid && (
                 <ListGroup.Item>
                   {loadingPay && <Loader />}
+
                   {isPending ? (
                     <Loader />
                   ) : (
                     <div>
+                      {/* THIS BUTTON IS FOR TESTING! REMOVE BEFORE PRODUCTION! */}
                       {/* <Button
-                        onClick={onApproveTest}
                         style={{ marginBottom: '10px' }}
+                        onClick={onApproveTest}
                       >
                         Test Pay Order
                       </Button> */}
+
                       <div>
                         <PayPalButtons
                           createOrder={createOrder}
@@ -274,28 +249,12 @@ const OrderScreen = () => {
                     <Button
                       type='button'
                       className='btn btn-block'
-                      onClick={deliverOrderHandler}
+                      onClick={deliverHandler}
                     >
                       Mark As Delivered
                     </Button>
                   </ListGroup.Item>
                 )}
-                              {loadingUndeliver && <Loader />}
-
-{userInfo &&
-  userInfo.isAdmin &&
-  order.isPaid &&
-  order.isDelivered && (
-    <ListGroup.Item>
-      <Button
-        type='button'
-        className='btn btn-block'
-        onClick={undeliverOrderHandler}
-      >
-        Mark As Not Delivered
-      </Button>
-    </ListGroup.Item>
-  )}
             </ListGroup>
           </Card>
         </Col>
