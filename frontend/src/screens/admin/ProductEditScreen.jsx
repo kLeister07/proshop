@@ -57,11 +57,12 @@ const ProductEditScreen = () => {
         countInStock,
         description,
     }
-    const result = await updateProduct(updatedProduct)
+    const result = await updateProduct(updatedProduct).unwrap();
     if(result.error) {
       toast.error(result.error)
     } else {
       toast.success('Product updated')
+      refetch();
       navigate('/admin/productlist')
     }
   };
