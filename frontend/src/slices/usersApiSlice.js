@@ -1,3 +1,4 @@
+import { get } from 'mongoose';
 import { USERS_URL } from '../constants';
 import { apiSlice } from './apiSlice';
 
@@ -30,6 +31,13 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    getUsers: builder.query({
+      query: () => ({
+        url: USERS_URL,
+      }),
+      providesTags: ['User'],
+      keepUnusedDataFor: 5,
+    }),
   }),
 });
 
@@ -38,4 +46,5 @@ export const {
   useLogoutMutation,
   useRegisterMutation,
   useProfileMutation,
+  useGetUsersQuery,
 } = usersApiSlice;
