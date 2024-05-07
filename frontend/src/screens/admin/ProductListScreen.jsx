@@ -14,12 +14,15 @@ import {
 
 const ProductListScreen = () => {
   const { pageNumber } = useParams();
-  const { data, error, isLoading, refetch } = useGetProductsQuery({ pageNumber});
+  const { data, error, isLoading, refetch } = useGetProductsQuery({
+    pageNumber,
+  });
 
   const [createProduct, { isLoading: loadingCreate }] =
     useCreateProductMutation();
 
-  const [deleteProduct, { isLoading: loadingDelete}] = useDeleteProductMutation();
+  const [deleteProduct, { isLoading: loadingDelete }] =
+    useDeleteProductMutation();
 
   const deleteHandler = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
@@ -101,10 +104,7 @@ const ProductListScreen = () => {
               ))}
             </tbody>
           </Table>
-          <Paginate
-            pages={data.pages}
-            page={data.page}
-            isAdmin={true} />
+          <Paginate pages={data.pages} page={data.page} isAdmin={true} />
         </>
       )}
     </>
