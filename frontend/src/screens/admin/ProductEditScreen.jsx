@@ -81,7 +81,7 @@ const ProductEditScreen = () => {
     } catch (err) {
       toast.error(err?.data?.message || err.error);
     }
-  }
+  };
 
   return (
     <>
@@ -125,8 +125,13 @@ const ProductEditScreen = () => {
                 value={image}
                 onChange={(e) => setImage}
               ></Form.Control>
-              <Form.Control type='file' label='Choose File' onChange={uploadFileHandler} ></Form.Control>
+              <Form.Control
+                type='file'
+                label='Choose File'
+                onChange={uploadFileHandler}
+              ></Form.Control>
             </Form.Group>
+            {loadingUpload && <Loader />}
 
             <Form.Group className='my-2' controlId='brand'>
               <Form.Label>Brand</Form.Label>
