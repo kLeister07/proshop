@@ -5,7 +5,7 @@ import {
   Col,
   ListGroup,
   Image,
-  Form,
+  // Form,
   Card,
   Button,
 } from 'react-bootstrap';
@@ -82,14 +82,14 @@ const OrderScreen = () => {
     });
   }
 
-  async function onApproveTest() {
-    await payOrder({ orderId, details: { payer: {} } }).unwraop();
-    refetch();
-    toast.success('Payment successful');
-  }
-  function onError(err) {
-    toast.error(err.message);
-  }
+  // async function onApproveTest() {
+  //   await payOrder({ orderId, details: { payer: {} } }).unwrap();
+  //   refetch();
+  //   toast.success('Payment successful');
+  // }
+  // function onError(err) {
+  //   toast.error(err.message);
+  // }
 
   function createOrder(data, actions) {
     return actions.order
