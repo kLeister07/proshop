@@ -1,3 +1,4 @@
+import cors from 'cors';
 import path from 'path';
 import express from 'express';
 import dotenv from 'dotenv';
@@ -51,7 +52,13 @@ if(process.env.NODE_ENV === 'production') {
 
 app.use(notFound);
 app.use(errorHandler);
+app.use(cors(corsOptions));
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
+const corsOptions = {
+  origin: 'https://thunderous-trifle-b200f7.netlify.app/', // Replace with your Netlify frontend URL
+  credentials: true,
+};
