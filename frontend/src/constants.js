@@ -1,4 +1,4 @@
-export const BASE_URL = process.env.Node_ENV === 'development' ? 'http://localhost:5001' : '';
+export const BASE_URL = process.env.Node_ENV === 'development' ? 'http://localhost:5001' : 'https://proshop-hvfv.onrender.com';
 // export const BASE_URL = process.env.Node_ENV === 'development' ? '' : process.env.SERVER_URL;
 
 export const PRODUCTS_URL = `/api/products`;
