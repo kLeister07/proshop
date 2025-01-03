@@ -37,7 +37,7 @@ const OrderScreen = () => {
   const [deliverOrder, { isLoading: loadingDeliver }] =
     useDeliverOrderMutation();
 
-    const [undeliverOrder, { isLoading: loadingUndeliver }] =
+  const [undeliverOrder, { isLoading: loadingUndeliver }] =
     useUndeliverOrderMutation();
 
   const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
@@ -256,7 +256,7 @@ const OrderScreen = () => {
                         <PayPalButtons
                           createOrder={createOrder}
                           onApprove={onApprove}
-                          onError={onError}
+                          onError={error}
                         ></PayPalButtons>
                       </div>
                     </div>
@@ -280,22 +280,22 @@ const OrderScreen = () => {
                     </Button>
                   </ListGroup.Item>
                 )}
-                              {loadingUndeliver && <Loader />}
+              {loadingUndeliver && <Loader />}
 
-{userInfo &&
-  userInfo.isAdmin &&
-  order.isPaid &&
-  order.isDelivered && (
-    <ListGroup.Item>
-      <Button
-        type='button'
-        className='btn btn-block'
-        onClick={undeliverOrderHandler}
-      >
-        Mark As Not Delivered
-      </Button>
-    </ListGroup.Item>
-  )}
+              {userInfo &&
+                userInfo.isAdmin &&
+                order.isPaid &&
+                order.isDelivered && (
+                  <ListGroup.Item>
+                    <Button
+                      type='button'
+                      className='btn btn-block'
+                      onClick={undeliverOrderHandler}
+                    >
+                      Mark As Not Delivered
+                    </Button>
+                  </ListGroup.Item>
+                )}
             </ListGroup>
           </Card>
         </Col>
